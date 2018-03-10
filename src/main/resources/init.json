@@ -1,0 +1,50 @@
+{
+  "dealers": [
+    {
+      "id": "ab49f56a-451d-4721-8319-efdca5e69680",
+      "name": "MB Albufeira",
+      "latitude": 37.104404,
+      "longitude": -8.236308,
+      "closed": [
+        "tuesday",
+        "wednesday"
+      ],
+      "vehicles": [
+        {
+          "id": "3928f780-295b-4dd0-8cc9-28c0738398d9",
+          "model": "AMG",
+          "fuel": "ELECTRIC",
+          "transmission": "AUTO",
+          "availability": {
+            "thursday": [
+              "1000",
+              "1030"
+            ],
+            "monday": [
+              "1000",
+              "1030"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "bookings": [
+    {
+      "id": "1c6bd910-12b1-45d6-b4d8-cdff2f37db90",
+      "firstName": "Joanna",
+      "lastName": "Randolph",
+      "vehicleId": "3928f780-295b-4dd0-8cc9-28c0738398d9",
+      "pickupDate": "2018-03-03T10:30:00",
+      "createdAt": "2018-02-26T08:42:46.291"
+    },
+    {
+      "id": "fdaab47c-a067-43bd-8278-eec5ca413fd3",
+      "firstName": "Abdullah",
+      "lastName": "Randolph",
+      "vehicleId": "3928f780-295b-4dd0-8cc9-28c0738398d9",
+      "pickupDate": "2018-03-06T10:30:00",
+      "createdAt": "2018-02-26T08:42:46.3"
+    }
+  ]
+}
