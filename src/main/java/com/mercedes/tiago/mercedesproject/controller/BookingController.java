@@ -1,10 +1,7 @@
 package com.mercedes.tiago.mercedesproject.controller;
 
 import com.mercedes.tiago.mercedesproject.dto.BookingDTO;
-import com.mercedes.tiago.mercedesproject.exception.BookingAlreadyExistsException;
-import com.mercedes.tiago.mercedesproject.exception.BookingNotFoundException;
-import com.mercedes.tiago.mercedesproject.exception.ReasonDoesntExistException;
-import com.mercedes.tiago.mercedesproject.exception.VehicleNotFoundException;
+import com.mercedes.tiago.mercedesproject.exception.*;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Booking;
 import com.mercedes.tiago.mercedesproject.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +33,8 @@ public class BookingController {
     }
 
     @PutMapping("/cancel/{idString}")
-    public BookingDTO cancelBookingByName(@PathVariable(value = "idString") String idString,
-                                          @RequestBody String reason) throws ReasonDoesntExistException, BookingNotFoundException {
+    public void cancelBookingByName(@PathVariable(value = "idString") String idString,
+                                          @RequestBody String reason) throws ReasonDoesntExistException, BookingNotFoundException, BookingAlreadyCanceledException {
         bookingService.cancelBooking(idString, reason);
     }
 }

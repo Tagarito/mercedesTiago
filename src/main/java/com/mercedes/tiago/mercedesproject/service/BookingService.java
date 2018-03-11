@@ -1,10 +1,7 @@
 package com.mercedes.tiago.mercedesproject.service;
 
 import com.mercedes.tiago.mercedesproject.dto.BookingDTO;
-import com.mercedes.tiago.mercedesproject.exception.BookingAlreadyExistsException;
-import com.mercedes.tiago.mercedesproject.exception.BookingNotFoundException;
-import com.mercedes.tiago.mercedesproject.exception.ReasonDoesntExistException;
-import com.mercedes.tiago.mercedesproject.exception.VehicleNotFoundException;
+import com.mercedes.tiago.mercedesproject.exception.*;
 import com.mercedes.tiago.mercedesproject.persistence.classes.AvailabilityHours;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Booking;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Vehicle;
@@ -132,14 +129,19 @@ public class BookingService {
 
             }catch (ReasonDoesntExistException e) {
                 throw new RuntimeException("Programmer should provide a reason for booking canceling on processing of starter file.");
+            } catch (BookingAlreadyCanceledException e) {
+                throw new RuntimeException("Booking was already canceled");
             }
         }
         throw new BookingAlreadyExistsException();
 
     }
 
-    public Booking cancelBooking(String idString, String reason) throws BookingNotFoundException, ReasonDoesntExistException {
+    public Booking cancelBooking(String idString, String reason) throws BookingNotFoundException, ReasonDoesntExistException, BookingAlreadyCanceledException {
         Booking booking = this.getBooking(idString);
+        if(booking.getCancelledAt() != null){
+            throw new BookingAlreadyCanceledException();
+        }
         booking.setCancelledAt(DateTime.now().getMillis());
         if(reason == null || reason.isEmpty()){
             throw new ReasonDoesntExistException();
@@ -149,7 +151,10 @@ public class BookingService {
         return booking;
     }
 
-    public Booking cancelBooking(Booking booking, String reason) throws ReasonDoesntExistException {
+    public Booking cancelBooking(Booking booking, String reason) throws ReasonDoesntExistException, BookingAlreadyCanceledException {
+        if(booking.getCancelledAt() != null){
+            throw new BookingAlreadyCanceledException();
+        }
         booking.setCancelledAt(DateTime.now().getMillis());
         if(reason == null || reason.isEmpty()){
             throw new ReasonDoesntExistException();
