@@ -1,9 +1,7 @@
 package com.mercedes.tiago.mercedesproject.persistence.classes;
 
-import org.joda.time.DateTime;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +25,14 @@ public class Vehicle {
     @ElementCollection
     private Map<String, AvailabilityHours> availability;
 
-    @Column(name = "DEALER_ID")
-    private Long dealerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DEALER_ID")
+    private Dealer dealer;
 
     private Long createdAtMilliseconds;
+
+    @OneToMany(mappedBy = "vehicle")
+    private List<Booking> bookings = new ArrayList<>();
 
 
     public Vehicle() {
@@ -41,12 +43,15 @@ public class Vehicle {
     }
 
 
-    public Long getDealerId() {
-        return dealerId;
+    public Dealer getDealer() {
+        return dealer;
     }
 
-    public void setDealerId(Long dealerId) {
-        this.dealerId = dealerId;
+    public void setDealer(Dealer dealer) {
+        this.dealer = dealer;
+        if(!dealer.getVehicles().contains(this)){
+            dealer.getVehicles().add(this);
+        }
     }
 
     public void setId(Long id) {
@@ -101,6 +106,21 @@ public class Vehicle {
         this.availability = availability;
     }
 
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    public void addBooking(Booking booking){
+        this.bookings.add(booking);
+        if(booking.getVehicle() != this){
+            booking.setVehicle(this);
+        }
+    }
+
     @Override
     public String toString() {
         return "Vehicle{" +
@@ -110,7 +130,7 @@ public class Vehicle {
                 ", fuel='" + fuel + '\'' +
                 ", transmission='" + transmission + '\'' +
                 ", availability=" + availability +
-                ", dealerId=" + dealerId +
+                ", dealer=" + dealer +
                 ", createdAtMilliseconds=" + createdAtMilliseconds +
                 '}';
     }

@@ -1,6 +1,8 @@
 package com.mercedes.tiago.mercedesproject.dto;
 
 
+import com.mercedes.tiago.mercedesproject.persistence.classes.Booking;
+import com.mercedes.tiago.mercedesproject.persistence.classes.Vehicle;
 import org.joda.time.DateTime;
 
 public class BookingDTO {
@@ -22,6 +24,20 @@ public class BookingDTO {
     private String cancelledReason;
 
     public BookingDTO() {
+    }
+
+    public BookingDTO(Booking booking) {
+        this.id = booking.getIdString();
+        VehicleDTO vehicleDTO = new VehicleDTO(booking.getVehicle());
+
+        this.vehicleId = vehicleDTO.getId();
+        this.firstName = booking.getFirstName();
+        this.lastName = booking.getLastName();
+        this.pickupDate = new DateTime(booking.getPickupDate());
+        this.createdAt = new DateTime(booking.getCreatedAt());
+        this.cancelledAt = new DateTime(booking.getCancelledAt());
+        this.cancelledReason = booking.getCancelledReason();
+
     }
 
     public String getId() {

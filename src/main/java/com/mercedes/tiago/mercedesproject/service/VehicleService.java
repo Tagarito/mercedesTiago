@@ -1,11 +1,9 @@
 package com.mercedes.tiago.mercedesproject.service;
 
 import com.mercedes.tiago.mercedesproject.dto.VehicleDTO;
-import com.mercedes.tiago.mercedesproject.exception.AvailabilityMapContainsNonHoursException;
-import com.mercedes.tiago.mercedesproject.exception.AvailabilityMapContainsNonWeekDaysException;
-import com.mercedes.tiago.mercedesproject.exception.ClosedListContainsNonWeekDaysException;
-import com.mercedes.tiago.mercedesproject.exception.VehicleAlreadyExistsException;
+import com.mercedes.tiago.mercedesproject.exception.*;
 import com.mercedes.tiago.mercedesproject.persistence.classes.AvailabilityHours;
+import com.mercedes.tiago.mercedesproject.persistence.classes.Booking;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Dealer;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Vehicle;
 import com.mercedes.tiago.mercedesproject.persistence.repository.AvailabilityHoursRepository;
@@ -33,8 +31,9 @@ public class VehicleService {
     private AvailabilityHoursRepository availabilityHoursRepository;
 
 
-    public Vehicle addVehicle(VehicleDTO vehicleDTO, Long id) throws VehicleAlreadyExistsException, AvailabilityMapContainsNonWeekDaysException, AvailabilityMapContainsNonHoursException {
-        return this.addVehicle(id,
+
+    public Vehicle addVehicle(VehicleDTO vehicleDTO, Dealer dealer) throws VehicleAlreadyExistsException, AvailabilityMapContainsNonWeekDaysException, AvailabilityMapContainsNonHoursException {
+        return this.addVehicle(dealer,
                 vehicleDTO.getId(),
                 vehicleDTO.getModel(),
                 vehicleDTO.getFuel(),
@@ -43,55 +42,71 @@ public class VehicleService {
         );
     }
 
-    private Vehicle addVehicle(Long dealerId, String id,
+    private Vehicle addVehicle(Dealer dealer, String idString,
                                String model,
                                String fuel,
                                String transmission,
                                HashMap<String, List<String>> availabilityDto) throws VehicleAlreadyExistsException, AvailabilityMapContainsNonWeekDaysException, AvailabilityMapContainsNonHoursException {
 
-        Vehicle vehicleCheck = vehicleRepository.findByidString(id);
-        if(vehicleCheck != null){
-            throw new VehicleAlreadyExistsException();
-        }
-        Vehicle vehicle = new Vehicle();
-        vehicle.setDealerId(dealerId);
-        vehicle.setIdString(id);
-        vehicle.setModel(model);
-        vehicle.setFuel(fuel);
-        vehicle.setTransmission(transmission);
-        Map<String, List<Long>> availability = new HashMap<>();
-        for(Map.Entry<String, List<String>> a: availabilityDto.entrySet()){
-            String toAdd = a.getKey().toUpperCase();
+        Vehicle vehicleCheck = null;
+        try {
+            vehicleCheck = this.getVehicle(idString);
+        } catch (VehicleNotFoundException ve) {
+            Vehicle vehicle = new Vehicle();
+            vehicle.setDealer(dealer);
+            vehicle.setIdString(idString);
+            vehicle.setModel(model);
+            vehicle.setFuel(fuel);
+            vehicle.setTransmission(transmission);
+            vehicle.setCreatedAtMilliseconds(new DateTime().getMillis());
 
-            try {
-                DayOfWeek.valueOf(toAdd);
-            }catch (IllegalArgumentException e){
-                throw new AvailabilityMapContainsNonWeekDaysException();
+            //PARSE DTO TO Map<String, HashMap<Long, Boolean>>
+            Map<String, HashMap<Long, String>> availability = new HashMap<>();
+            for (Map.Entry<String, List<String>> a : availabilityDto.entrySet()) {
+                String toAdd = a.getKey().toUpperCase();
+
+                try {
+                    DayOfWeek.valueOf(toAdd);
+                } catch (IllegalArgumentException e) {
+                    throw new AvailabilityMapContainsNonWeekDaysException();
+                }
+
+                HashMap<Long, String> availabilityHoursLong = new HashMap<>();
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("HHmm");
+                DateTime dt;
+                for (String s : a.getValue()) {
+                    dt = formatter.parseDateTime(s);
+
+                    //"" represents noone has reserved this hour slot. null was bringing aditional JPA problems.
+                    availabilityHoursLong.put(dt.getMillis(), "");
+                }
+
+                availability.put(toAdd, availabilityHoursLong);
+
             }
 
-            List<Long> availabilityHoursLong = new ArrayList<>();
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("HHmm");
-            DateTime dt;
-            for(String s: a.getValue()){
-                dt = formatter.parseDateTime(s);
-                availabilityHoursLong.add(dt.getMillis());
+            //TRANSFORM HashMap<Long, Boolean> in AvailabilityHours because of JPA
+            Map<String, AvailabilityHours> availabilitySave = new HashMap<>();
+            for (Map.Entry<String, HashMap<Long, String>> a : availability.entrySet()) {
+                AvailabilityHours availabilityHours = new AvailabilityHours();
+                availabilityHours.setVehicleId(idString);
+
+                //Used to be able to cancel bookings
+                //Every hour starts bookable on a vehicle
+                HashMap<Long, String> availabiltyHashMap = new HashMap<>();
+                for(Map.Entry<Long, String> l : a.getValue().entrySet()){
+                    availabiltyHashMap.put(l.getKey(), l.getValue());
+                }
+                availabilityHours.setHours(availabiltyHashMap);
+                availabilityHours.setDayOfWeek(a.getKey());
+                availabilityHours = availabilityHoursRepository.save(availabilityHours);
+                availabilitySave.put(a.getKey(), availabilityHours);
             }
-
-            availability.put(toAdd, availabilityHoursLong);
-
+            vehicle.setAvailability(availabilitySave);
+            vehicleRepository.save(vehicle);
+            return vehicle;
         }
-        Map<String, AvailabilityHours> availabilitySave = new HashMap<>();
-        for(Map.Entry<String, List<Long>> a: availability.entrySet()){
-            AvailabilityHours availabilityHours = new AvailabilityHours();
-            availabilityHours.setVehicleId(id);
-            availabilityHours.setHours(a.getValue());
-            availabilityHours.setDayOfWeek(a.getKey());
-            availabilityHours = availabilityHoursRepository.save(availabilityHours);
-            availabilitySave.put(a.getKey(), availabilityHours);
-        }
-        vehicle.setAvailability(availabilitySave);
-        vehicleRepository.save(vehicle);
-        return vehicle;
+        throw new VehicleAlreadyExistsException();
     }
 
     @Transactional
@@ -104,5 +119,47 @@ public class VehicleService {
             }
             vehicleRepository.delete(vehicle);
         }
+    }
+
+    public Vehicle getVehicle(String id) throws VehicleNotFoundException {
+        Vehicle vehicle = vehicleRepository.findByidString(id);
+        if(vehicle == null){
+            throw new VehicleNotFoundException();
+        }
+        return vehicle;
+    }
+
+    public Vehicle saveVehicle(Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
+    }
+
+    public AvailabilityHours saveAvailabilityHours(AvailabilityHours availabilityHours){
+        return availabilityHoursRepository.save(availabilityHours);
+    }
+
+    public void setBooking(String vehicleId, Booking booking) throws VehicleNotFoundException {
+        Vehicle vehicle = this.getVehicle(vehicleId);
+        vehicle.addBooking(booking);
+        vehicleRepository.save(vehicle);
+    }
+
+    public List<Vehicle> getVehiclesByModel(String vehicleModel) {
+        return vehicleRepository.getVehiclesByModel(vehicleModel);
+    }
+
+    public List<Vehicle> getVehiclesByFuel(String vehicleFuel) {
+        return vehicleRepository.getVehiclesByFuel(vehicleFuel);
+    }
+
+    public List<Vehicle> getVehiclesByTransmission(String vehicleTransmission) {
+        return vehicleRepository.getVehiclesByTransmission(vehicleTransmission);
+    }
+
+    public List<Vehicle> getVehiclesByDealer(String dealerName) {
+        return vehicleRepository.getVehiclesByDealer(dealerName);
+    }
+
+    public List<Vehicle> getVehiclesByAttributes(String model, String fuel, String transmission) {
+        return vehicleRepository.getVehiclesWithAttributes(model, fuel, transmission);
     }
 }

@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Map;
 
 //Limitations of Hibernate
 @Entity
@@ -15,8 +16,8 @@ public class AvailabilityHours {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ElementCollection(targetClass = Long.class)
-    private List<Long> hours;
+    @ElementCollection
+    private Map<Long, String> hours;
 
     private String vehicleId;
 
@@ -30,11 +31,15 @@ public class AvailabilityHours {
     }
 
 
-    public List<Long> getHours() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Map<Long, String> getHours() {
         return hours;
     }
 
-    public void setHours(List<Long> hours) {
+    public void setHours(Map<Long, String> hours) {
         this.hours = hours;
     }
 
@@ -53,4 +58,6 @@ public class AvailabilityHours {
     public void setDayOfWeek(String dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
+
+
 }

@@ -1,7 +1,5 @@
 package com.mercedes.tiago.mercedesproject.persistence.classes;
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +22,8 @@ public class Dealer {
 
     private double longitude;
 
-    @ElementCollection
-    @CollectionTable(name = "VEHICLES",
-            joinColumns = @JoinColumn(name = "DEALER_ID",referencedColumnName = "DEALER_ID"))
-    @Column(name = "VEHICLE_ID")
-    private List<Long> vehicles  = new ArrayList<>();
+    @OneToMany(mappedBy = "dealer")
+    private List<Vehicle> vehicles = new ArrayList<>();
 
     @ElementCollection(targetClass = String.class)
     private List<String> closed = new ArrayList<>();
@@ -69,9 +64,7 @@ public class Dealer {
         this.longitude = longitude;
     }
 
-    public void setVehicles(List<Long> vehicles) {
-        this.vehicles = vehicles;
-    }
+
 
     public void setClosed(List<String> closed) {
         this.closed = closed;
@@ -96,14 +89,26 @@ public class Dealer {
     }
 
 
-
-    public List<Long> getVehicles() {
+    public List<Vehicle> getVehicles() {
         return vehicles;
+    }
+
+    public void setVehicles(List<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 
     public List<String> getClosed() {
         return closed;
     }
+
+    public void addVehicle(Vehicle vehicle){
+        this.vehicles.add(vehicle);
+        if(vehicle.getDealer() != this){
+            vehicle.setDealer(this);
+        }
+    }
+
+
 
     @Override
     public String toString() {

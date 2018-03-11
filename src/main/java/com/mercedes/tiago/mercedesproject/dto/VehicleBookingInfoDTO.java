@@ -6,12 +6,10 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class VehicleDTO {
+public class VehicleBookingInfoDTO {
 
     private String id;
 
@@ -21,31 +19,29 @@ public class VehicleDTO {
 
     private String transmission;
 
-    private HashMap<String, List<String>> availability= new HashMap<>();
+    private HashMap<String, HashMap<String, String>> availability= new HashMap<>();
 
-    public VehicleDTO() {
+    public VehicleBookingInfoDTO() {
     }
 
-    public VehicleDTO(Vehicle v) {
+    public VehicleBookingInfoDTO(Vehicle v) {
         this.id = v.getIdString();
         this.model=v.getModel();
         this.fuel = v.getFuel();
         this.transmission = v.getTransmission();
-        HashMap<String, List<String>> copyAvailability = new HashMap<>();
-        List<String> copyListString;
+        HashMap<String, HashMap<String, String>> copyAvailability = new HashMap<>();
+        HashMap<String, String> copyListString;
         DateTimeFormatter formatter = DateTimeFormat.forPattern("HHmm");
         for(Map.Entry<String, AvailabilityHours> a: v.getAvailability().entrySet()){
-            copyListString = new ArrayList<>();
-            for(Map.Entry<Long, String> l:a.getValue().getHours().entrySet()){
+            copyListString = new HashMap<>();
+            for(Map.Entry<Long, String> bookedHour:a.getValue().getHours().entrySet()){
                 //pass hours to string
-                copyListString.add(new DateTime(l.getKey()).toString(formatter));
+                copyListString.put(new DateTime(bookedHour).toString(formatter), bookedHour.getValue());
             }
             copyAvailability.put(a.getKey(), copyListString);
         }
         this.availability = copyAvailability;
     }
-
-
 
     public String getId() {
         return id;
@@ -79,11 +75,11 @@ public class VehicleDTO {
         this.transmission = transmission;
     }
 
-    public HashMap<String, List<String>> getAvailability() {
+    public HashMap<String, HashMap<String, String>> getAvailability() {
         return availability;
     }
 
-    public void setAvailability(HashMap<String, List<String>> availability) {
+    public void setAvailability(HashMap<String, HashMap<String, String>> availability) {
         this.availability = availability;
     }
 

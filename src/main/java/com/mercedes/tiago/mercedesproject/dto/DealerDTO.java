@@ -1,5 +1,9 @@
 package com.mercedes.tiago.mercedesproject.dto;
 
+import com.mercedes.tiago.mercedesproject.persistence.classes.Dealer;
+import com.mercedes.tiago.mercedesproject.persistence.classes.Vehicle;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class DealerDTO {
@@ -10,21 +14,26 @@ public class DealerDTO {
 
     private double latitude;
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
     private double longitude;
 
-    private List<VehicleDTO> vehicles;
+    private List<VehicleDTO> vehicles = new ArrayList<>();
 
-    private List<String> closed;
+    private List<String> closed= new ArrayList<>();
 
     public DealerDTO() {
+    }
+
+    public DealerDTO(Dealer dealer) {
+        this.id = dealer.getIdString();
+        this.name=dealer.getName();
+        this.latitude=dealer.getLatitude();
+        this.longitude =dealer.getLongitude();
+        for(Vehicle v: dealer.getVehicles()){
+            vehicles.add(new VehicleDTO(v));
+        }
+        for(String s:dealer.getClosed()){
+            closed.add(new String(s).toLowerCase());
+        }
     }
 
     public String getId() {
@@ -65,6 +74,14 @@ public class DealerDTO {
 
     public void setClosed(List<String> closed) {
         this.closed = closed;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
