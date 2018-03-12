@@ -35,9 +35,8 @@ public class MercedesProjectApplication implements CommandLineRunner {
 		objectMapper.registerModule(new JodaModule());
 		byte[] initFile = Files.readAllBytes(Paths.get("src/main/resources/init2.json"));
 		RootDTO rootDTO = objectMapper.readValue(initFile, RootDTO.class);
-//		testDTO rootDTO = objectMapper.readValue(initFile, testDTO.class);
-		dealerService.addDealers(rootDTO.getDealers());
-		bookingService.addBookings(rootDTO.getBookings());
+//		dealerService.addDealers(rootDTO.getDealers());
+//		bookingService.addBookings(rootDTO.getBookings());
 		System.out.println(rootDTO.getDealers());
 		System.out.println(rootDTO.getBookings());
 		System.out.println(rootDTO.getBookings().size());

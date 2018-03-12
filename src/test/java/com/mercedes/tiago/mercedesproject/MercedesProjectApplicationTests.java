@@ -11,6 +11,7 @@ public class MercedesProjectApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("ola");
 	}
 
 }

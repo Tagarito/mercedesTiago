@@ -42,7 +42,8 @@ public class VehicleService {
         );
     }
 
-    private Vehicle addVehicle(Dealer dealer, String idString,
+    public Vehicle addVehicle(Dealer dealer,
+                               String idString,
                                String model,
                                String fuel,
                                String transmission,

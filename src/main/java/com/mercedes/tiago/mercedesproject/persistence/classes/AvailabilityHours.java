@@ -59,5 +59,23 @@ public class AvailabilityHours {
         this.dayOfWeek = dayOfWeek;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        AvailabilityHours that = (AvailabilityHours) o;
+
+        if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
+        if (vehicleId != null ? !vehicleId.equals(that.vehicleId) : that.vehicleId != null) return false;
+        return dayOfWeek != null ? dayOfWeek.equals(that.dayOfWeek) : that.dayOfWeek == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hours != null ? hours.hashCode() : 0;
+        result = 31 * result + (vehicleId != null ? vehicleId.hashCode() : 0);
+        result = 31 * result + (dayOfWeek != null ? dayOfWeek.hashCode() : 0);
+        return result;
+    }
 }
