@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +159,8 @@ public class VehicleService {
         return vehicleRepository.getVehiclesByDealer(dealerName);
     }
 
-    public List<Vehicle> getVehiclesByAttributes(String model, String fuel, String transmission) {
+    //This could be easily extended to only search for part of the attributes.
+    public List<Dealer> getVehiclesByAttributes(String model, String fuel, String transmission) {
         return vehicleRepository.getVehiclesWithAttributes(model, fuel, transmission);
     }
 }

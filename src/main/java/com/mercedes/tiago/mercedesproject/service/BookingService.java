@@ -85,7 +85,6 @@ public class BookingService {
 
                 if (pickupDate != null) {
 
-                    System.out.println(pickupDate);
 
                     Vehicle vehicle = vehicleService.getVehicle(vehicleId);
                     DayOfWeek dow = DayOfWeek.of(pickupDate.getDayOfWeek());
@@ -182,27 +181,16 @@ public class BookingService {
             }
         });
        List<Booking> bookingAfter = new ArrayList<>();
-//        int bookingsRepeated = 0;
-//        int vehiclesNotFound = 0;
-//        List<String> repeatedBookings = new ArrayList<>();
         for(BookingDTO bookingDTO:bookings){
             try {
                 bookingAfter.add(this.addBookingDTO(bookingDTO));
             } catch (BookingAlreadyExistsException e) {
-//                bookingsRepeated++;
-//                repeatedBookings.add(bookingDTO.getId());
                 throw e;
             } catch (VehicleNotFoundException e) {
-//                vehiclesNotFound++;
                 throw e;
             }
         }
-//        System.out.println(bookingsRepeated);
-//        System.out.println(vehiclesNotFound);
-//        for(String s: repeatedBookings){
-//            System.out.println(s);
-//        }
-//        System.out.println("Repeated Ids: "+repeatedBookings.size());
+
         return bookingAfter;
     }
 

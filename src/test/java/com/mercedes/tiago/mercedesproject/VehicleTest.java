@@ -250,7 +250,22 @@ public class VehicleTest {
 
     }
 
-    private HashMap<String, List<String>> transformIntoDTO(Map<String, AvailabilityHours> availabilityHoursMap) {
+    @Test(expected = VehicleAlreadyExistsException.class)
+    public void SERVICE_addVehicleThatAlreadyExists() throws AvailabilityMapContainsNonHoursException, VehicleAlreadyExistsException, AvailabilityMapContainsNonWeekDaysException {
+        dealer.setIdString(dealerId+4);
+        when(dealerMock.getIdString()).thenReturn(dealerId+3);
+        dealer = dealerRepository.save(dealer);
+        vehicle.setIdString(idString+4);
+        setAvailabilityHoursVehicleIdAndSave(vehicle.getIdString());
+
+        HashMap<String, List<String>> availabilityDto = transformIntoDTO(availabilityHoursMap);
+        Vehicle vehicleServiceReturn = vehicleService.addVehicle(dealer, vehicle.getIdString(), model, fuel, transmission, availabilityDto);
+        Vehicle vehicleServiceReturn2 = vehicleService.addVehicle(dealer, vehicle.getIdString(), model, fuel, transmission, availabilityDto);
+
+    }
+
+
+        private HashMap<String, List<String>> transformIntoDTO(Map<String, AvailabilityHours> availabilityHoursMap) {
         HashMap<String, List<String>> copyAvailability = new HashMap<>();
         List<String> copyListString;
         DateTimeFormatter formatter = DateTimeFormat.forPattern("HHmm");
