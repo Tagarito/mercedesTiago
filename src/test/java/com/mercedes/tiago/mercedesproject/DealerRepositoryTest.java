@@ -1,9 +1,8 @@
 package com.mercedes.tiago.mercedesproject;
 
-import com.mercedes.tiago.mercedesproject.dto.DealerDTO;
-import com.mercedes.tiago.mercedesproject.dto.VehicleDTO;
 import com.mercedes.tiago.mercedesproject.persistence.classes.Dealer;
 import com.mercedes.tiago.mercedesproject.persistence.repository.DealerRepository;
+import com.mercedes.tiago.mercedesproject.service.DealerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +18,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 public class DealerRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
 
     @Autowired
     private DealerRepository dealerRepository;
@@ -35,10 +31,10 @@ public class DealerRepositoryTest {
         //given
         Dealer dealer = new Dealer();
         dealer.setIdString(idString);
-        entityManager.persist(dealer);
-        entityManager.flush();
+        dealerRepository.save(dealer);
 
         //when
+
         Dealer found = dealerRepository.findByidString(idString);
 
         //then
