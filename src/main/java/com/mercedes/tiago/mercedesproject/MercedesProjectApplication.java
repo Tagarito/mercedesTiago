@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 @SpringBootApplication
 public class MercedesProjectApplication implements CommandLineRunner {
 
-	public static final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Autowired
 	private DealerService dealerService;

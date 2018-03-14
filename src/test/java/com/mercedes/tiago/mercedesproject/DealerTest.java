@@ -1,5 +1,6 @@
 package com.mercedes.tiago.mercedesproject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.mercedes.tiago.mercedesproject.dto.*;
 import com.mercedes.tiago.mercedesproject.exception.*;
@@ -19,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mercedes.tiago.mercedesproject.MercedesProjectApplication.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -30,6 +30,7 @@ public class DealerTest {
     private DealerService dealerService;
 
     private static boolean initialized = false;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String dealerId = "testdealerid1";
     private final String dealerName = "testdealername1";
