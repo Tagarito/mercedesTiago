@@ -1,8 +1,6 @@
 package com.mercedes.tiago.mercedesproject.dto;
 
-import javafx.util.Pair;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
